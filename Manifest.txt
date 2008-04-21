@@ -1,0 +1,6 @@
+.gemified
+History.txt
+License.txt
+README.txt
+bin/dtask
+lib/dtask.rb

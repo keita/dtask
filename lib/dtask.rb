@@ -2,6 +2,8 @@ require "net/ssh"
 require "singleton"
 
 class DTask
+  VERSION = "001"
+
   class Error < StandardError; end
 
   class Config

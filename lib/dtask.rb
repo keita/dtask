@@ -2,30 +2,32 @@ require "net/ssh"
 require "singleton"
 
 class DTask
-  VERSION = "001"
+  VERSION = "002"
 
+  # Command error.
   class Error < StandardError; end
 
+  # DTask configuration.
   class Config
     include Singleton
 
     def initialize; @table = Hash.new; end
-    def o(table); table.each {|key, val| @table[key] = val }; end
 
-    class << self
-      def method_missing(name, *args)
-        if md = /(.+)=$/.match(name.to_s)
-          instance.instance_eval { @table[name] = args.first }
-        else
-          instance.instance_eval { @table[name] }
-        end
+    def self.method_missing(name, *args)
+      if md = /(.+)=$/.match(name.to_s)
+        instance.instance_eval { @table[name] = args.first }
+      else
+        instance.instance_eval { @table[name] }
       end
     end
+
+    private
+
+    def o(table); table.each {|key, val| @table[key] = val }; end
   end
 
   class Remote
-    attr_reader :out
-    attr_reader :err
+    attr_reader :out, :err
 
     def initialize
       options = {
@@ -38,22 +40,17 @@ class DTask
       @err = []
     end
 
-    def pout(msg)
-      puts "OUT> #{msg}"
-    end
-
-    def perr(msg)
-      puts "ERR> #{msg}"
-    end
-
+    # Run the command or call the task.
     def l(cmd)
       cmd.kind_of?(Symbol) ? DTask.run(cmd) : sh(cmd)
     end
 
+    # Ignore errors.
     def l!(cmd)
       begin l(cmd) rescue Error end
     end
 
+    # Run the command.
     def sh(cmd)
       puts "% #{cmd}"
       res = @shell.send_command(cmd)
@@ -64,18 +61,34 @@ class DTask
       res.status == 0 ? res.stdout : (raise Error)
     end
 
+    # Change the current to application directory.
     def cd_appdir
       l "cd #{Config.appdir} && pwd"
     end
+
+    private
+
+    # Print stdout.
+    def pout(msg)
+      puts "OUT> #{msg}"
+    end
+
+    # Print stderr.
+    def perr(msg)
+      puts "ERR> #{msg}"
+    end
   end
 
+  # task table
   TASK = Hash.new
 
+  # Load the dtask file.
   def initialize(name)
     load File.expand_path("~/.dtask/#{name}.dtask")
     @remote = Remote.new
   end
 
+  # Run the task.
   def run(task)
     if TASK.key?(task)
       puts "#{Config.server} >>> #{task}"
@@ -88,10 +101,12 @@ class DTask
 end
 
 module Kernel
+  # Defines a task.
   def task(name, &block)
     DTask::TASK[name] = block
   end
 
+  # Setup the DTask configuration.
   def setup(&block)
     DTask::Config.instance.instance_eval(&block)
   end

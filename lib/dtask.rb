@@ -61,7 +61,7 @@ class DTask
       perr res.stderr if res.stderr and res.stderr.size > 0
       @out << res.stdout
       @err << res.stderr
-      res.status == 0 ? res.stdout : raise Error
+      res.status == 0 ? res.stdout : (raise Error)
     end
 
     def cd_appdir

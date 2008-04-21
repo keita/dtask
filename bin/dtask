@@ -1,0 +1,22 @@
+require "rubygems"
+require "dtask"
+require "optparse"
+
+Option = OptionParser.new do |opt|
+  opt.on("--help") do
+    puts opt.help
+  end
+
+  opt.parse!(ARGV)
+end
+
+name, task = ARGV
+
+if name
+  DTask.new(name).run(task.to_sym)
+else
+  puts "dtask list:"
+  Dir.glob(File.expand_path("~/.dtask/*.dtask")) do |path|
+    puts " * " + File.basename(path, ".dtask")
+  end
+end

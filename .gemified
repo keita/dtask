@@ -1,11 +1,11 @@
 --- 
 :summary: DTask provides easy way to deploy web application.
 :email: keita.yamaguchi@gmail.com
-:has_rdoc: true
 :name: dtask
+:has_rdoc: true
 :homepage: http://rubyforge.org/projects/dtask/
-:version: "001"
+:version: "002"
+:rubyforge_project: dtask
 :dependencies: 
 - net-ssh
-:rubyforge_project: dtask
 :author: Keita Yamaguchi

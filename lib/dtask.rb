@@ -26,15 +26,12 @@ class DTask
     def o(table); table.each {|key, val| @table[key] = val }; end
   end
 
-  class Remote
+  # Remote box.
+  class RemoteBox
     attr_reader :out, :err
 
     def initialize
-      options = {
-        :username => Config.user,
-        :auth_methods => "publickey"
-      }
-      @session = Net::SSH.start(Config.server, options)
+      @session = Net::SSH.start(Config.server, Config.user)
       @shell = @session.shell.sync
       @out = []
       @err = []
@@ -85,7 +82,7 @@ class DTask
   # Load the dtask file.
   def initialize(name)
     load File.expand_path("~/.dtask/#{name}.dtask")
-    @remote = Remote.new
+    @remote = RemoteBox.new
   end
 
   # Run the task.
